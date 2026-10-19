@@ -1,0 +1,58 @@
+/* assets/style.css */
+:root {
+    --primary: #1F4E79;
+    --primary-light: #EBF1F5;
+    --accent: #0288D1;
+    --success: #2ECC71;
+    --warning: #F39C12;
+    --danger: #E74C3C;
+    --bg-body: #F4F7F6;
+    --text-main: #2C3E50;
+    --text-muted: #7F8C8D;
+    --border-color: #DCDDE1;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+aside { width: 280px; background: #FFF; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; }
+.brand { padding: 24px; font-size: 18px; font-weight: bold; color: var(--primary); border-bottom: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; }
+.brand span { background: var(--primary); color: #FFF; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+
+.menu { list-style: none; padding: 16px 0; }
+.menu li a { display: block; padding: 12px 24px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-left: 4px solid transparent; cursor: pointer; }
+.menu li a.active, .menu li a:hover { background-color: var(--primary-light); color: var(--primary); border-left-color: var(--primary); }
+
+main { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+header { background: #FFF; padding: 16px 32px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+.header-title h1 { font-size: 20px; color: var(--primary); }
+.header-title p { font-size: 12px; color: var(--text-muted); }
+
+.content-body { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+.view-section { display: none; flex-direction: column; gap: 24px; }
+.view-section.active { display: flex; }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.card { background: #FFF; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+.card h4 { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+.card .value { font-size: 22px; font-weight: bold; color: var(--primary); }
+
+.workspace-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; }
+.panel { background: #FFF; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; }
+.panel h3 { font-size: 15px; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: #FAFAFA; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn-submit { background: var(--primary); color: #FFF; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; }
+.btn-submit:hover { background: #153659; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+th { background: var(--primary-light); color: var(--primary); padding: 10px; border-bottom: 1px solid var(--border-color); }
+td { padding: 10px; border-bottom: 1px solid var(--border-color); }
+.badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-success { background: #E8F8F5; color: var(--success); }
+.badge-warning { background: #FEF9E7; color: var(--warning); }
+.badge-danger { background: #FDEDEC; color: var(--danger); }
