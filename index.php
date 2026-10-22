@@ -422,16 +422,15 @@
         }
 
         // --- FITUR CETAK SLIP GAJI ---
-       function printSlipGaji(p) {
+       // --- PERBAIKAN CETAK SLIP GAJI DENGAN RINCIAN KOMPONEN TERPISAH ---
+        function printSlipGaji(p) {
             let gajiPokok = Number(p.gaji_pokok) || 0;
-            let thp = Number(p.take_home_pay) || 0;
-            
-            // Perhitungan selisih variabel komponen gaji jika tidak tersimpan terpisah
-            let penyesuaian = thp - gajiPokok;
-            let lembur = penyesuaian > 0 ? penyesuaian : 0;
-            let potongan = penyesuaian < 0 ? Math.abs(penyesuaian) : 0;
+            let lembur    = Number(p.lembur) || 0;
+            let bonus     = Number(p.bonus) || 0;
+            let potongan  = Number(p.potongan) || 0;
+            let thp       = Number(p.take_home_pay) || (gajiPokok + lembur + bonus - potongan);
 
-            let printWindow = window.open('', '_blank', 'width=800,height=650');
+            let printWindow = window.open('', '_blank', 'width=800,height=680');
             let html = `
                 <!DOCTYPE html>
                 <html>
@@ -483,8 +482,12 @@
                                 <td class="text-right">Rp ${gajiPokok.toLocaleString('id-ID')}</td>
                             </tr>
                             <tr>
-                                <td>Tunjangan / Lembur / Bonus (+)</td>
+                                <td>Lembur (+)</td>
                                 <td class="text-right">Rp ${lembur.toLocaleString('id-ID')}</td>
+                            </tr>
+                            <tr>
+                                <td>Bonus (+)</td>
+                                <td class="text-right">Rp ${bonus.toLocaleString('id-ID')}</td>
                             </tr>
                             <tr>
                                 <td>Potongan (PPh 21 / BPJS / Absensi) (-)</td>
@@ -557,8 +560,25 @@
                 body: JSON.stringify({id_payroll: document.getElementById('payroll-id').value, id_karyawan: document.getElementById('payroll-karyawan-id').value, periode_payroll: document.getElementById('payroll-periode').value, gaji_pokok: document.getElementById('payroll-gaji').value, lembur: document.getElementById('payroll-lembur').value, bonus: document.getElementById('payroll-bonus').value, potongan: document.getElementById('payroll-potongan').value, status_approval: document.getElementById('payroll-status').value})
             }).then(res => res.json()).then(res => { alert(res.message); resetPayroll(); loadAllData(); });
         });
-        function editPayroll(p) { document.getElementById('payroll-title').innerText = "Edit Payroll Sheet"; document.getElementById('payroll-id').value = p.id_payroll; document.getElementById('payroll-karyawan-id').value = p.id_karyawan; document.getElementById('payroll-periode').value = p.periode_payroll; document.getElementById('payroll-gaji').value = p.gaji_pokok; document.getElementById('payroll-status').value = p.status_approval; }
-        function resetPayroll() { document.getElementById('payroll-title').innerText = "Buat / Kelola Payroll Sheet"; document.getElementById('form-payroll').reset(); document.getElementById('payroll-id').value = ''; }
+       function editPayroll(p) {
+    document.getElementById('payroll-title').innerText = "Edit Payroll Sheet";
+    document.getElementById('payroll-id').value = p.id_payroll;
+    document.getElementById('payroll-karyawan-id').value = p.id_karyawan;
+    document.getElementById('payroll-periode').value = p.periode_payroll;
+    document.getElementById('payroll-gaji').value = p.gaji_pokok;
+    
+    // PERBAIKAN: Masukkan kembali nilai lembur, bonus, dan potongan ke form input
+    document.getElementById('payroll-lembur').value = p.lembur || 0;
+    document.getElementById('payroll-bonus').value = p.bonus || 0;
+    document.getElementById('payroll-potongan').value = p.potongan || 0;
+    
+    document.getElementById('payroll-status').value = p.status_approval;
+}
+        function resetPayroll() { 
+        document.getElementById('payroll-title').innerText = "Buat / Kelola Payroll Sheet"; 
+        document.getElementById('form-payroll').reset(); 
+        document.getElementById('payroll-id').value = ''; 
+        }
         function deletePayroll(id) { if(confirm('Hapus?')) fetch('api.php?action=delete_payroll', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id_payroll:id})}).then(r=>r.json()).then(res=>{alert(res.message);loadAllData();}); }
 
 // Submit Handler Transaksi Pembayaran

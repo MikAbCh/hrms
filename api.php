@@ -43,10 +43,10 @@ if ($action === 'get_dashboard_data') {
         $compa = $row['midpoint_salary'] > 0 ? round($row['gaji_aktual'] / $row['midpoint_salary'], 2) : 1;
         $row['compa_ratio'] = $compa;
         if ($compa < 0.85) {
-            $row['status_compa'] = 'Red Circle (Underpaid)';
+            $row['status_compa'] = 'Green Circle (Underpaid)';
             $row['badge_class'] = 'badge-warning';
         } elseif ($compa > 1.15) {
-            $row['status_compa'] = 'Green Circle (Overpaid)';
+            $row['status_compa'] = 'Red Circle (Overpaid)';
             $row['badge_class'] = 'badge-danger';
         } else {
             $row['status_compa'] = 'Normal Market';
@@ -163,25 +163,25 @@ if ($action === 'delete_karyawan' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'save_payroll' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     $id = $input['id_payroll'] ?? '';
-    $thp = (float)$input['gaji_pokok'] + (float)($input['lembur'] ?? 0) + (float)($input['bonus'] ?? 0) - (float)($input['potongan'] ?? 0);
     
+    $gaji_pokok = (float)$input['gaji_pokok'];
+    $lembur     = (float)($input['lembur'] ?? 0);
+    $bonus      = (float)($input['bonus'] ?? 0);
+    $potongan   = (float)($input['potongan'] ?? 0);
+    
+    // Hitung ulang total Take-Home Pay secara akurat
+    $thp = $gaji_pokok + $lembur + $bonus - $potongan;
+
     if (!empty($id)) {
-        $stmt = $pdo->prepare("UPDATE Payroll_Sheet SET id_karyawan=?, periode_payroll=?, gaji_pokok=?, take_home_pay=?, status_approval=? WHERE id_payroll=?");
-        $stmt->execute([$input['id_karyawan'], $input['periode_payroll'], $input['gaji_pokok'], $thp, $input['status_approval'], $id]);
+        $stmt = $pdo->prepare("UPDATE Payroll_Sheet SET id_karyawan=?, periode_payroll=?, gaji_pokok=?, lembur=?, bonus=?, potongan=?, take_home_pay=?, status_approval=? WHERE id_payroll=?");
+        $stmt->execute([$input['id_karyawan'], $input['periode_payroll'], $gaji_pokok, $lembur, $bonus, $potongan, $thp, $input['status_approval'], $id]);
         $msg = "Payroll Sheet berhasil diperbarui!";
     } else {
-        $stmt = $pdo->prepare("INSERT INTO Payroll_Sheet (id_karyawan, periode_payroll, gaji_pokok, take_home_pay, status_approval) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$input['id_karyawan'], $input['periode_payroll'], $input['gaji_pokok'], $thp, $input['status_approval']]);
+        $stmt = $pdo->prepare("INSERT INTO Payroll_Sheet (id_karyawan, periode_payroll, gaji_pokok, lembur, bonus, potongan, take_home_pay, status_approval) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$input['id_karyawan'], $input['periode_payroll'], $gaji_pokok, $lembur, $bonus, $potongan, $thp, $input['status_approval']]);
         $msg = "Payroll Sheet berhasil dibuat!";
     }
     echo json_encode(['status' => 'success', 'message' => $msg]);
-    exit;
-}
-
-if ($action === 'delete_payroll' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $pdo->prepare("DELETE FROM Payroll_Sheet WHERE id_payroll = ?")->execute([$input['id_payroll']]);
-    echo json_encode(['status' => 'success', 'message' => 'Payroll Sheet dihapus!']);
     exit;
 }
 
