@@ -213,6 +213,7 @@
                 <div class="workspace-grid">
                     <div class="panel">
                         <h3 id="payroll-title">Buat / Kelola Payroll Sheet</h3>
+                        <!-- Form Payroll Sheet -->
                         <form id="form-payroll">
                             <input type="hidden" id="payroll-id">
                             <div class="form-group"><label>Pilih Karyawan</label><select class="form-control" id="payroll-karyawan-id" required></select></div>
@@ -220,14 +221,25 @@
                                 <div class="form-group"><label>Periode (YYYY-MM)</label><input type="text" class="form-control" id="payroll-periode" value="2026-10" required></div>
                                 <div class="form-group"><label>Gaji Pokok</label><input type="number" class="form-control" id="payroll-gaji" required></div>
                             </div>
+
+                            <!-- FIELD LEMBUR DENGAN KALKULATOR OPSIONAL -->
+                            <div class="form-group" style="background: var(--primary-light); padding: 12px; border-radius: 6px; border: 1px dashed var(--border-color);">
+                                <label><b>Komponen Lembur (IDR)</b></label>
+                                <input type="number" class="form-control" id="payroll-lembur" value="0" required style="background: #FFF; margin-bottom: 8px;">
+                                
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Kalkulator Cepat Lembur (Opsional):</div>
+                                <div class="form-row" style="margin-bottom: 0;">
+                                    <input type="number" class="form-control" id="calc-tarif" placeholder="Upah / Jam (Opsional)" oninput="hitungLemburOtomatis()" style="background: #FFF;">
+                                    <input type="number" class="form-control" id="calc-jam" placeholder="Jumlah Jam (Opsional)" oninput="hitungLemburOtomatis()" style="background: #FFF;">
+                                </div>
+                            </div>
+
                             <div class="form-row">
-                                <div class="form-group"><label>Lembur</label><input type="number" class="form-control" id="payroll-lembur" value="0"></div>
                                 <div class="form-group"><label>Bonus</label><input type="number" class="form-control" id="payroll-bonus" value="0"></div>
-                            </div>
-                            <div class="form-row">
                                 <div class="form-group"><label>Potongan</label><input type="number" class="form-control" id="payroll-potongan" value="0"></div>
-                                <div class="form-group"><label>Status Approval</label><select class="form-control" id="payroll-status"><option value="Draft">Draft</option><option value="Audited">Audited</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div>
                             </div>
+                            <div class="form-group"><label>Status Approval</label><select class="form-control" id="payroll-status"><option value="Draft">Draft</option><option value="Audited">Audited</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div>
+                            
                             <button type="submit" class="btn-submit">Simpan Payroll Sheet</button>
                             <button type="button" class="btn-submit" style="background:#7F8C8D; margin-top:5px;" onclick="resetPayroll()">Batal</button>
                         </form>
@@ -566,6 +578,8 @@
     document.getElementById('payroll-karyawan-id').value = p.id_karyawan;
     document.getElementById('payroll-periode').value = p.periode_payroll;
     document.getElementById('payroll-gaji').value = p.gaji_pokok;
+    document.getElementById('calc-tarif').value = '';
+    document.getElementById('calc-jam').value = '';
     
     // PERBAIKAN: Masukkan kembali nilai lembur, bonus, dan potongan ke form input
     document.getElementById('payroll-lembur').value = p.lembur || 0;
@@ -578,6 +592,8 @@
         document.getElementById('payroll-title').innerText = "Buat / Kelola Payroll Sheet"; 
         document.getElementById('form-payroll').reset(); 
         document.getElementById('payroll-id').value = ''; 
+        document.getElementById('calc-tarif').value = '';
+        document.getElementById('calc-jam').value = '';
         }
         function deletePayroll(id) { if(confirm('Hapus?')) fetch('api.php?action=delete_payroll', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id_payroll:id})}).then(r=>r.json()).then(res=>{alert(res.message);loadAllData();}); }
 
@@ -611,6 +627,17 @@
         function deleteTransaksi(id) { if(confirm('Hapus?')) fetch('api.php?action=delete_transaksi', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id_transaksi:id})}).then(r=>r.json()).then(res=>{alert(res.message);loadAllData();}); }
 
         document.addEventListener('DOMContentLoaded', () => { loadDashboardData(); });
+
+        // --- FUNGSI KALKULATOR OTOMATIS LEMBUR (OPSIONAL) ---
+        function hitungLemburOtomatis() {
+            let tarif = parseFloat(document.getElementById('calc-tarif').value) || 0;
+            let jam = parseFloat(document.getElementById('calc-jam').value) || 0;
+            
+            if (tarif > 0 && jam > 0) {
+                let totalLembur = Math.round(tarif * jam);
+                document.getElementById('payroll-lembur').value = totalLembur;
+            }
+        }
     </script>
 </body>
 </html>
